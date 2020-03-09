@@ -129,7 +129,7 @@ pub(super) struct JobOwner<'tcx, Q: QueryDescription<'tcx>> {
     id: QueryJobId,
 }
 
-impl<'tcx, Q: QueryDescription<'tcx>> JobOwner<'tcx, Q> {
+impl<'tcx, Q: QueryDescription<'tcx> + 'tcx> JobOwner<'tcx, Q> {
     /// Either gets a `JobOwner` corresponding the query, allowing us to
     /// start executing the query, or returns with the result of the query.
     /// This function assumes that `try_get_cached` is already called and returned `lookup`.
@@ -477,7 +477,7 @@ impl<'tcx> TyCtxt<'tcx> {
     }
 
     #[inline(always)]
-    pub(super) fn try_execute_query<Q: QueryDescription<'tcx>>(
+    pub(super) fn try_execute_query<Q: QueryDescription<'tcx> + 'tcx>(
         self,
         span: Span,
         key: Q::Key,
@@ -641,7 +641,7 @@ impl<'tcx> TyCtxt<'tcx> {
     }
 
     #[inline(always)]
-    fn force_query_with_job<Q: QueryDescription<'tcx>>(
+    fn force_query_with_job<Q: QueryDescription<'tcx> + 'tcx>(
         self,
         key: Q::Key,
         job: JobOwner<'tcx, Q>,
