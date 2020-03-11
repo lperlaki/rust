@@ -263,7 +263,12 @@ where
     /// Completes the query by updating the query cache with the `result`,
     /// signals the waiter and forgets the JobOwner, so it won't poison the query
     #[inline(always)]
-    pub(super) fn complete(self, tcx: TyCtxt<'tcx>, result: &C::Value, dep_node_index: DepNodeIndex) {
+    pub(super) fn complete(
+        self,
+        tcx: TyCtxt<'tcx>,
+        result: &C::Value,
+        dep_node_index: DepNodeIndex,
+    ) {
         // We can move out of `self` here because we `mem::forget` it below
         let key = unsafe { ptr::read(&self.key) };
         let state = self.state;
