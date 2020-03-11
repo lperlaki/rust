@@ -98,7 +98,6 @@ impl<'tcx, C: QueryCache> QueryState<'tcx, C> {
         shards.iter().all(|shard| shard.active.is_empty())
     }
 
-    #[inline]
     pub(super) fn try_collect_active_jobs(
         &self,
         kind: DepKind,
