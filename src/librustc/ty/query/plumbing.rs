@@ -962,25 +962,6 @@ macro_rules! define_queries_inner {
             })*
         }
 
-        // This module and the functions in it exist only to provide a
-        // predictable symbol name prefix for query providers. This is helpful
-        // for analyzing queries in profilers.
-        pub(super) mod __query_compute {
-            use super::*;
-
-            $(#[inline(never)]
-            pub fn $name(tcx: TyCtxt<'tcx>, key: $K) -> $V {
-                let provider = tcx.queries.providers.get(key.query_crate())
-                    // HACK(eddyb) it's possible crates may be loaded after
-                    // the query engine is created, and because crate loading
-                    // is not yet integrated with the query engine, such crates
-                    // would be missing appropriate entries in `providers`.
-                    .unwrap_or(&tcx.queries.fallback_extern_providers)
-                    .$name;
-                provider(tcx, key)
-            })*
-        }
-
         $(impl<$tcx> QueryConfig<$tcx> for queries::$name<$tcx> {
             type Key = $K;
             type Value = $V;
@@ -1006,9 +987,16 @@ macro_rules! define_queries_inner {
                 DepConstructor::$node(tcx, *key)
             }
 
-            #[inline]
+            #[inline(never)]
             fn compute(tcx: TyCtxt<'tcx>, key: Self::Key) -> Self::Value {
-                __query_compute::$name(tcx, key)
+                let provider = tcx.queries.providers.get(key.query_crate())
+                    // HACK(eddyb) it's possible crates may be loaded after
+                    // the query engine is created, and because crate loading
+                    // is not yet integrated with the query engine, such crates
+                    // would be missing appropriate entries in `providers`.
+                    .unwrap_or(&tcx.queries.fallback_extern_providers)
+                    .$name;
+                provider(tcx, key)
             }
 
             fn hash_result(
