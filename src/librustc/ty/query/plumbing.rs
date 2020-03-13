@@ -987,7 +987,7 @@ macro_rules! define_queries_inner {
                 DepConstructor::$node(tcx, *key)
             }
 
-            #[inline(never)]
+            #[inline]
             fn compute(tcx: TyCtxt<'tcx>, key: Self::Key) -> Self::Value {
                 let provider = tcx.queries.providers.get(key.query_crate())
                     // HACK(eddyb) it's possible crates may be loaded after
