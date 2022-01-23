@@ -414,3 +414,19 @@ where
         self.1.extend_reserve(additional);
     }
 }
+
+#[stable(feature = "extend_for_mut", since = "1.58.0")]
+impl<E, T> Extend<T> for &mut E
+where
+    E: ?Sized + Extend<T>,
+{
+    fn extend<I: IntoIterator<Item = T>>(&mut self, iter: I) {
+        E::extend(self, iter);
+    }
+    fn extend_one(&mut self, item: T) {
+        E::extend_one(self, item);
+    }
+    fn extend_reserve(&mut self, additional: usize) {
+        E::extend_reserve(self, additional);
+    }
+}
